@@ -1,0 +1,6 @@
+import { api, Run } from "@/lib/api";
+import { Status } from "@/components/Status";
+import { TraceTimeline } from "@/components/TraceTimeline";
+export const dynamic="force-dynamic";
+export default async function Page({params}:{params:Promise<{id:string}>}){const {id}=await params;const run=await api<Run|null>(`/runs/${id}`,null);if(!run)return <section className="panel empty">Run not found or API unavailable.</section>;return <><header className="pageHead"><div><p className="eyebrow">TRACE / {run.id.slice(0,8)}</p><h1>Run inspection</h1><p>{run.goal}</p></div><Status value={run.status}/></header><section className="kpis compact"><article><span>Tokens</span><strong>{run.tokens_used}</strong></article><article><span>Estimated cost</span><strong>${run.estimated_cost_usd.toFixed(4)}</strong></article><article><span>Steps</span><strong>{run.steps?.length||0}</strong></article><article><span>Artifacts</span><strong>{run.artifacts?.length||0}</strong></article></section><section className="panel"><TraceTimeline steps={run.steps||[]}/></section><section className="panel artifacts"><div className="panelTitle"><h2>Artifacts and evidence</h2></div>{run.artifacts?.map((a,i)=><details key={i}><summary>{a.name}</summary><pre>{JSON.stringify(a.content,null,2)}</pre></details>)}</section></>}
+
